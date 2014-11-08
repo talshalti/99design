@@ -121,6 +121,12 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="type" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="page_number" type="int" indexed="true" stored="true" />
+   <field name="catalog_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="img" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="HTML_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="search_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
         
    <field name="sku" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
    <field name="name" type="text_general" indexed="true" stored="true"/>
@@ -273,7 +279,11 @@
    <copyField source="name" dest="text"/>
    <copyField source="manu" dest="text"/>
    <copyField source="features" dest="text"/>
+   <copyField source="search_keywords" dest="text"/>
+   <copyField source="HTML_keywords" dest="text"/>
+   <copyField source="features" dest="text"/>
    <copyField source="includes" dest="text"/>
+
    <copyField source="manu" dest="manu_exact"/>
 
    <!-- Copy the price into a currency enabled field (default USD) -->
