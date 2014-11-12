@@ -18,9 +18,15 @@
 <add>
 <doc>
   <field name="id">SP2514N</field>
-  <field name="name">Samsung SpinPoint P120 SP2514N - hard drive - 250 GB - ATA-133</field>
+  <field name="name">Samsung lol SpinPoint P120 SP2514N - hard drive - 250 GB - ATA-133</field>
   <field name="manu">Samsung Electronics Co. Ltd.</field>
   <!-- Join -->
+  <doc>
+    <field name="id">SP2514N1</field>
+    <field name="manu_id_s">samsung</field>
+    <field name="cat">electronics</field>
+    <field name="cat">hard drive</field>  
+  </doc>
   <field name="manu_id_s">samsung</field>
   <field name="cat">electronics</field>
   <field name="cat">hard drive</field>

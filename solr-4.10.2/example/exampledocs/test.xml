@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<add>
+	<doc>
+		<field name="id">1</field>
+		<field name="name">I am the parent</field>
+		<field name="cat">PARENT</field>
+		<doc>
+			<field name="id">1.1</field>
+			<field name="name">I am the 1st child</field>
+			<field name="cat">CHILD</field>
+		</doc>
+		<doc>
+			<field name="id">1.2</field>
+			<field name="name">I am the 2nd child</field>
+			<field name="cat">CHILD</field>
+			<doc>
+				<field name="id">1.2.1</field>
+				<field name="name">I am a grandchildren</field>
+				<field name="cat">GRANDCHILD</field>
+			</doc>
+		</doc>
+	</doc>
+</add>
