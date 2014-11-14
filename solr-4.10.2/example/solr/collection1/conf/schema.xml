@@ -128,6 +128,7 @@
    <field name="logo" type="string" stored="true" /> 
    <field name="HTML_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="search_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="owner" type="text_general" indexed="true" stored="true" multiValued="true"/>
 
    <field name="owned_catalogs" type="text_general" indexed="true" stored="true" multiValued="true"/>
         
@@ -289,6 +290,8 @@
    <copyField source="HTML_keywords" dest="text"/>
    <copyField source="features" dest="text"/>
    <copyField source="includes" dest="text"/>
+   <copyField source="owner" dest="text"/>
+
 
    <copyField source="manu" dest="manu_exact"/>
 
@@ -770,7 +773,7 @@
    <!-- some examples for different languages (generally ordered by ISO code) -->
 
     <!-- Arabic -->
-    <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_he" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <!-- for any non-arabic -->
