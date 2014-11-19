@@ -5,14 +5,10 @@
  * Date: 12/11/2014
  * Time: 23:00
  */
-ini_set('error_reporting', E_ALL);
 define('DIRECT', false);
 require_once("config.php");
 require_once("database.php");
 require_once("functions.php");
-
-
-
 function solrGet($url)
 {
     $ch = curl_init();
@@ -112,17 +108,10 @@ function Invalid_Words($words)
  */
 function Create_Query_For_Solr($words_list)
 {
-    $query = "";
-    if(count($words_list) != 1)
-    {
-        $query = '"' . implode(" ", $words_list) . '"~' . round(count($words_list) * 1.5) . " ";
-    }
-    $query .= implode("~ and ", $words_list) . "~";
     $myArr = array(
         "wt" => "json",
-        "q" => $query
+        "q" => '"' . implode(" ", $words_list) . '"~' . abs(count($words_list) * 1.5) . ' ' . implode("~ ", $words_list) . "~"
     );
-	
     if (array_key_exists("type", $_GET)) {
         $myArr["fq"] = "type:" . $_GET["type"];
     }
@@ -152,19 +141,11 @@ function Print_Error($error_message)
 }
 function main()
 {
-    if(isset($_GET["q"]))
+    if(!array_key_exists("q", $_GET))
     {
-		if($_GET["q"] !== "")
-		{
-			$query = urldecode(filter_input(INPUT_GET, "q", FILTER_SANITIZE_ENCODED));
-			$query = preg_replace('/\s+/', ' ', $query);
-			Search(trim($query));
-			
-			return;
-		}
+        Print_Error("enter a query");
+        return;
     }
-	
-	echo json_encode(array());
-    return;
+    Search($_GET["q"]);
 }
 main();

@@ -1,0 +1,102 @@
+$(".catalogPage").hover(function(){
+        $(this).find(".slideHover").animate({width: "100%"}, 300);
+    }, function() {
+        $(this).find(".slideHover").animate({width: "0px"}, 300);
+    });
+
+    $.tmpl( $("#pageResultTemplate").html(), { "Link" : "John Doe" }).appendTo( ".container" );
+
+    $(".pageLink").click(function(Event)
+    {
+        // The page div
+        var thisObject = $(this).parent();
+
+        // Centered offset = left offset - page wrapper - arrow width/2 - outer width/2;
+        var leftOffset = thisObject.offset().left - 20 - 17 + thisObject.outerWidth() / 2;
+
+        // Select the next .first-item (row start) and append the box before it.
+        var nextRowObject = thisObject.nextAll( ".first-item, .last-row").slice(0, 1);
+
+        var htmlData = '<div class="pageInfo"><span class="topArrow"></span><span class="closeBox" onclick="closePageInfo();"></div>';
+
+
+        //Remove pageInfo element if exists
+        $(".pageInfo").remove();
+
+        if (nextRowObject.exists())
+        {
+            nextRowObject.before(htmlData)
+        }
+        else
+        {
+            $("#content").append(htmlData);
+        }
+
+        console.log(thisObject.offset().left, thisObject.outerWidth() / 2);
+
+        $(".topArrow").css({left: leftOffset});
+
+        Event.preventDefault();
+        return false;
+    });
+
+    $("#contactForm").submit(function(event){
+        // abort any pending request
+        if (request) {
+            request.abort();
+        }
+
+        // setup some local variables
+        var form = $(this);
+
+        // let's select and cache all the fields
+        var inputs = form.find("input, select, button, textarea");
+
+        // serialize the data in the form
+        var serializedData = form.serialize();
+
+        console.log(serializedData);
+
+        // let's disable the inputs for the duration of the ajax request
+        // Note: we disable elements AFTER the form data has been serialized.
+        // Disabled form elements will not be serialized.
+        inputs.prop("disabled", true);
+
+        console.log(serializedData);
+
+        // fire off the request to /form.php
+        request = $.ajax({
+            url: "http://99design.co.il/ajreq/useractionshandler",
+            type: "post",
+            data: serializedData
+        });
+
+        form.remove();
+        $(".leftContact").append('<span class="contactHead">לקוח יקר, תודה על פנייתך. </span>');
+
+        // callback handler that will be called on success
+        request.done(function (response, textStatus, jqXHR){
+            form.remove();
+            $(".leftContact").append('<span class="contactHead">לקוח יקר,תודה על פנייתך. </span>');
+        });
+
+        request.fail(function (jqXHR, textStatus, errorThrown){
+            // log the error to the console
+            console.log(
+                "The following error occurred: ",
+                textStatus, errorThrown
+            );
+        });
+
+        // callback handler that will be called regardless
+        // if the request failed or succeeded
+        request.always(function () {
+            // reenable the inputs
+            inputs.prop("disabled", false);
+        });
+
+        console.log("Done");
+        // prevent default posting of form
+        event.preventDefault();
+        return false;
+    });

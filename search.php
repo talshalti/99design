@@ -5,29 +5,26 @@
  * Date: 12/11/2014
  * Time: 23:00
  */
-
+ini_set('error_reporting', E_ALL);
 define('DIRECT', false);
-
 require_once("config.php");
 require_once("database.php");
 require_once("functions.php");
 
+
+
 function solrGet($url)
 {
     $ch = curl_init();
-
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_URL => $url,
         CURLOPT_PORT => 8983
     ));
-
     $output=curl_exec($ch);
-
     curl_close($ch);
     return $output;
 }
-
 function Search($words)
 {
     if(Invalid_Words($words))
@@ -35,10 +32,8 @@ function Search($words)
         Print_Error("ERROR OCCURED : Bad input");
         return;
     }
-
     $words_list = explode(" ",$words);
     $pages = Get_Relevant_Pages_ID_List($words_list);
-
     if(count($pages) != 0)
     {
         $database = Initialize_Database_Handler();
@@ -51,7 +46,6 @@ function Search($words)
         echo json_encode(array());
     }
 }
-
 /**
  * @param $results  mixed - resultset of the query
  * @return array - array of elements, so that each element contains info for the response
@@ -61,20 +55,20 @@ function Adapt_Results_To_Output($results)
     $return_value = array();
     foreach ($results as $row) {
         $return_value[] = array(
-            "sponsorName" => $row["SponserName"],
-            "catalogPageNum" => $row["PageNumber"],
-            "image" => "/images/magazines/pages/" . $row["pageImage"],
-            "catalogImage" => "/images/magazines/covers/" . $row["Image"],
-            "sponsorPhone" => $row["SponserPhone"],
-            "sponsorAddress" => $row["SponserAddress"],
-            "sponsorImage" => $row["SponserLogo"],
-            "pageID" => $row["pageID"],
-            "catalogID" => $row["ID"]
+            "sponsorName"           => $row["SponserName"],
+            "catalogPageNum"        => $row["PageNumber"],
+            "image"                 => $row["pageImage"],
+            "catalogImage"          => $row["Image"],
+            "sponsorPhone"          => $row["SponserPhone"],
+            "sponsorAddress"        => $row["SponserAddress"],
+            "sponsorImage"          => $row["SponserLogo"],
+            "pageID"                => $row["pageID"],
+            "catalogID"             => $row["ID"],
+            "catalogDescription"    => $row["Desc"]
         );
     }
     return $return_value;
 }
-
 /**
  * @param $pages array - array of pages id
  * @param $database Database - initialized database
@@ -90,7 +84,6 @@ function Query_Database_For_Pages_Information($pages, $database)
     $database->execute();
     return $database->resultset();
 }
-
 /**
  * @param $words_list array
  * @return array
@@ -98,7 +91,6 @@ function Query_Database_For_Pages_Information($pages, $database)
 function Get_Relevant_Pages_ID_List($words_list)
 {
     $myArr = Create_Query_For_Solr($words_list);
-
     $data = json_decode(solrGet("http://127.0.0.1/solr/collection1/query?" . http_build_query($myArr)));
     $pages = array();
     foreach ($data->{"response"}->{"docs"} as $doc) {
@@ -106,7 +98,6 @@ function Get_Relevant_Pages_ID_List($words_list)
     }
     return $pages;
 }
-
 /**
  * @param $words array  - the words list
  * @return bool - true if the words list are invalid, false otherwise
@@ -115,7 +106,6 @@ function Invalid_Words($words)
 {
     return strpos($words, "{") !== false or strpos($words, "[") !== false;
 }
-
 /**
  * @param $words_list array - the words list
  * @return array    the query arguments
@@ -126,18 +116,16 @@ function Create_Query_For_Solr($words_list)
         "wt" => "json",
         "q" => '"' . implode(" ", $words_list) . '"~' . abs(count($words_list) * 1.5) . ' ' . implode("~ ", $words_list) . "~"
     );
-
+	
     if (array_key_exists("type", $_GET)) {
         $myArr["fq"] = "type:" . $_GET["type"];
     }
-
     if (array_key_exists("st", $_GET)) {
         $myArr["start"] = $_GET["st"];
     }
     if (array_key_exists("l", $_GET)) {
         $myArr["rows"] = $_GET["l"];
     }
-
     if (array_key_exists("o", $_GET)) {
         $fq = "owner:(" . $_GET["o"] . ")";
         if (array_key_exists("fq", $myArr)) {
@@ -150,7 +138,6 @@ function Create_Query_For_Solr($words_list)
     }
     return $myArr;
 }
-
 function Print_Error($error_message)
 {
     echo json_encode(array(
@@ -159,11 +146,19 @@ function Print_Error($error_message)
 }
 function main()
 {
-    if(!array_key_exists("q", $_GET))
+    if(isset($_GET["q"]))
     {
-        Print_Error("enter a query");
-        return;
+		if($_GET["q"] !== "")
+		{
+			$query = urldecode(filter_input(INPUT_GET, "q", FILTER_SANITIZE_ENCODED));
+			$query = preg_replace('/\s+/', ' ', $query);
+			Search(trim($query));
+			
+			return;
+		}
     }
-    Search($_GET["q"]);
+	
+	echo json_encode(array());
+    return;
 }
 main();
