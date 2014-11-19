@@ -127,7 +127,7 @@
    <field name="img" type="string" indexed="true" stored="true" multiValued="false" /> 
    <field name="logo" type="string" stored="true" /> 
    <field name="HTML_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="search_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="search_keywords" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="owner" type="text_general" indexed="true" stored="true" multiValued="true"/>
 
    <field name="owned_catalogs" type="text_general" indexed="true" stored="true" multiValued="true"/>
@@ -286,7 +286,7 @@
    <copyField source="name" dest="text"/>
    <copyField source="manu" dest="text"/>
    <copyField source="features" dest="text"/>
-   <copyField source="search_keywords" dest="text"/>
+   <!--<copyField source="search_keywords" dest="text"/>-->
    <copyField source="HTML_keywords" dest="text"/>
    <copyField source="features" dest="text"/>
    <copyField source="includes" dest="text"/>
