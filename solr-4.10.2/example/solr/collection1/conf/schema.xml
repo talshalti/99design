@@ -128,8 +128,8 @@
    <field name="logo" type="string" stored="true" />
    <field name="HTML_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <!-- Image Attributes -->
-   <field name="thumbWidth" type="int" stored="true" indexed="false" />
-   <field name="thumbHeight" type="int" stored="true" indexed="false" />
+   <field name="thumbWidth" type="int" indexed="true" stored="true" />
+   <field name="thumbHeight" type="int" indexed="true" stored="true" />
    
    <field name="search_keywords" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="owner" type="text_general" indexed="true" stored="true" multiValued="true"/>
@@ -172,7 +172,7 @@
    -->
    <field name="title" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="subject" type="text_general" indexed="true" stored="true"/>
-   <field name="description" type="string" indexed="true" stored="true"/>
+   <field name="description" type="text_general" indexed="true" stored="true"/>
    <field name="comments" type="text_general" indexed="true" stored="true"/>
    <field name="author" type="text_general" indexed="true" stored="true"/>
    <field name="keywords" type="text_general" indexed="true" stored="true"/>
