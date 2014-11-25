@@ -25,25 +25,42 @@ function solrGet($url)
     curl_close($ch);
     return $output;
 }
-function Search($words)
+function Search($words, $must_have_first_word)
 {
+
     if(Invalid_Words($words))
     {
         Print_Error("ERROR OCCURED : Bad input");
         return;
     }
     $words_list = explode(" ",$words);
-    $pages = Get_Relevant_Pages_ID_List($words_list);
+    list($pages, $numFound) = Get_Relevant_Pages_ID_List_And_Num_Found($words_list, $must_have_first_word);
+
     if(count($pages) != 0)
     {
         $database = Initialize_Database_Handler();
         $results = Query_Database_For_Pages_Information($pages, $database);
         $return_value = Adapt_Results_To_Output($results);
-        echo json_encode($return_value);
+        echo json_encode(
+            array(
+                "results"=>$return_value,
+                "numFound"=>$numFound
+            ));
     }
     else
     {
-        echo json_encode(array());
+        if($must_have_first_word && $numFound == 0)
+        {
+            Search($words, false);
+        }
+        else
+        {
+            echo json_encode(
+                array(
+                    "results"=>[],
+                    "numFound"=>$numFound
+                ));
+        }
     }
 }
 /**
@@ -55,7 +72,7 @@ function Adapt_Results_To_Output($results)
     $return_value = array();
     foreach ($results as $row) {
         $return_value[] = array(
-            "sponsorName"           => $row["SponserName"],
+            "sponsorName"           => stripslashes($row["SponserName"]),
             "catalogPageNum"        => $row["PageNumber"],
             "image"                 => $row["pageImage"],
             "catalogImage"          => $row["Image"],
@@ -88,15 +105,16 @@ function Query_Database_For_Pages_Information($pages, $database)
  * @param $words_list array
  * @return array
  */
-function Get_Relevant_Pages_ID_List($words_list)
+function Get_Relevant_Pages_ID_List_And_Num_Found($words_list, $must_have_first_word)
 {
-    $myArr = Create_Query_For_Solr($words_list);
+    $myArr = Create_Query_For_Solr($words_list, $must_have_first_word);
     $data = json_decode(solrGet("http://127.0.0.1/solr/collection1/query?" . http_build_query($myArr)));
     $pages = array();
     foreach ($data->{"response"}->{"docs"} as $doc) {
         $pages[] = substr($doc->{"id"}, 3);
     }
-    return $pages;
+
+    return array($pages, $data->{"response"}->{"numFound"});
 }
 /**
  * @param $words array  - the words list
@@ -110,14 +128,13 @@ function Invalid_Words($words)
  * @param $words_list array - the words list
  * @return array    the query arguments
  */
-function Create_Query_For_Solr($words_list)
+function Create_Query_For_Solr($words_list, $must_have_first_word)
 {
-    $query = "";
-    if(count($words_list) != 1)
+	$query = "(" .implode("~0.6 AND ", $words_list). "~0.6)";
+    if ($must_have_first_word)
     {
-        $query = '"' . implode(" ", $words_list) . '"~' . round(count($words_list) * 1.5) . " ";
+        $query .= " AND description:/".$words_list[0]." .*/";
     }
-    $query .= implode("~ and ", $words_list) . "~";
     $myArr = array(
         "wt" => "json",
         "q" => $query
@@ -158,7 +175,7 @@ function main()
 		{
 			$query = urldecode(filter_input(INPUT_GET, "q", FILTER_SANITIZE_ENCODED));
 			$query = preg_replace('/\s+/', ' ', $query);
-			Search(trim($query));
+			Search(trim($query), true);
 			
 			return;
 		}
