@@ -121,23 +121,37 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="type" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="type" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="page_number" type="int" indexed="true" stored="true" />
-   <field name="catalog_id" type="string" indexed="true" stored="true" multiValued="false" /> 
+   <field name="catalog_id" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="img" type="string" indexed="true" stored="true" multiValued="false" /> 
-   <field name="logo" type="string" stored="true" /> 
+   <field name="logo" type="string" stored="true" />
    <field name="HTML_keywords" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <!-- Image Attributes -->
+   <field name="thumbWidth" type="int" stored="true" indexed="false" />
+   <field name="thumbHeight" type="int" stored="true" indexed="false" />
+   
    <field name="search_keywords" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="owner" type="text_general" indexed="true" stored="true" multiValued="true"/>
-
    <field name="owned_catalogs" type="text_general" indexed="true" stored="true" multiValued="true"/>
+
+
+
+
+
+
+
+
+
+
+
+
+ 
         
    <field name="sku" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
    <field name="name" type="text_general" indexed="true" stored="true"/>
-   <field name="address" type="text_general" indexed="true" stored="true"/>
    <field name="manu" type="text_general" indexed="true" stored="true" omitNorms="true"/>
    <field name="cat" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="sheker" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="features" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="includes" type="text_general" indexed="true" stored="true" termVectors="true" termPositions="true" termOffsets="true" />
 
@@ -147,8 +161,6 @@
    <field name="inStock" type="boolean" indexed="true" stored="true" />
 
    <field name="store" type="location" indexed="true" stored="true"/>
-
-   <field name="phone" type="phonetic" stored="true"/>
 
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.
@@ -286,14 +298,9 @@
    <copyField source="name" dest="text"/>
    <copyField source="manu" dest="text"/>
    <copyField source="features" dest="text"/>
-   <!--<copyField source="search_keywords" dest="text"/>-->
-   <copyField source="HTML_keywords" dest="text"/>
-   <copyField source="features" dest="text"/>
    <copyField source="includes" dest="text"/>
-   <copyField source="owner" dest="text"/>
-
-
    <copyField source="manu" dest="manu_exact"/>
+   <copyField source="HTML_keywords" dest="text"/>
 
    <!-- Copy the price into a currency enabled field (default USD) -->
    <copyField source="price" dest="price_c"/>
@@ -305,7 +312,6 @@
    <copyField source="keywords" dest="text"/>
    <copyField source="content" dest="text"/>
    <copyField source="content_type" dest="text"/>
-   <copyField source="sheker" dest="text"/>
    <copyField source="resourcename" dest="text"/>
    <copyField source="url" dest="text"/>
 
@@ -773,7 +779,7 @@
    <!-- some examples for different languages (generally ordered by ISO code) -->
 
     <!-- Arabic -->
-    <fieldType name="text_he" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <!-- for any non-arabic -->
