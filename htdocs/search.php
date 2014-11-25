@@ -79,9 +79,11 @@ function Adapt_Results_To_Output($results)
             "sponsorPhone"          => $row["SponserPhone"],
             "sponsorAddress"        => $row["SponserAddress"],
             "sponsorImage"          => $row["SponserLogo"],
+            "sponsorImage"          => $row["SponserLogo"],
             "pageID"                => $row["pageID"],
             "catalogID"             => $row["ID"],
-            "catalogDescription"    => $row["Desc"]
+            "catalogDescription"    => $row["Desc"],
+            "pageDescription"       => $row["HtmlDescription"]
         );
     }
     return $return_value;
@@ -130,7 +132,7 @@ function Invalid_Words($words)
  */
 function Create_Query_For_Solr($words_list, $must_have_first_word)
 {
-	$query = "(" .implode("~0.6 AND ", $words_list). "~0.6)";
+    $query = "(" .implode("~0.6 AND ", $words_list). "~0.6)";
     if ($must_have_first_word)
     {
         $query .= " AND description:/".$words_list[0]." .*/";
@@ -139,7 +141,7 @@ function Create_Query_For_Solr($words_list, $must_have_first_word)
         "wt" => "json",
         "q" => $query
     );
-	
+
     if (array_key_exists("type", $_GET)) {
         $myArr["fq"] = "type:" . $_GET["type"];
     }
@@ -171,17 +173,17 @@ function main()
 {
     if(isset($_GET["q"]))
     {
-		if($_GET["q"] !== "")
-		{
-			$query = urldecode(filter_input(INPUT_GET, "q", FILTER_SANITIZE_ENCODED));
-			$query = preg_replace('/\s+/', ' ', $query);
-			Search(trim($query), true);
-			
-			return;
-		}
+        if($_GET["q"] !== "")
+        {
+            $query = urldecode(filter_input(INPUT_GET, "q", FILTER_SANITIZE_ENCODED));
+            $query = preg_replace('/\s+/', ' ', $query);
+            Search(trim($query), true);
+
+            return;
+        }
     }
-	
-	echo json_encode(array());
+
+    echo json_encode(array());
     return;
 }
 main();
