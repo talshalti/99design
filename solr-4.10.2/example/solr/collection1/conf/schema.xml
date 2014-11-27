@@ -134,19 +134,6 @@
    <field name="search_keywords" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="owner" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="owned_catalogs" type="text_general" indexed="true" stored="true" multiValued="true"/>
-
-
-
-
-
-
-
-
-
-
-
-
- 
         
    <field name="sku" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
    <field name="name" type="text_general" indexed="true" stored="true"/>
@@ -172,7 +159,12 @@
    -->
    <field name="title" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="subject" type="text_general" indexed="true" stored="true"/>
+<<<<<<< HEAD
    <field name="description" type="text_general" indexed="true" stored="true"/>
+=======
+   <field name="description" type="string" indexed="true" stored="true"/>
+   <field name="description_term" type="text_general" indexed="true" stored="false" termVectors="true" termPositions="true" termOffsets="true" />
+>>>>>>> 8b006496ca72e337b50e62bb8c067ed6af7544c8
    <field name="comments" type="text_general" indexed="true" stored="true"/>
    <field name="author" type="text_general" indexed="true" stored="true"/>
    <field name="keywords" type="text_general" indexed="true" stored="true"/>
@@ -309,6 +301,7 @@
    <copyField source="title" dest="text"/>
    <copyField source="author" dest="text"/>
    <copyField source="description" dest="text"/>
+   <copyField source="description" dest="description_term" />
    <copyField source="keywords" dest="text"/>
    <copyField source="content" dest="text"/>
    <copyField source="content_type" dest="text"/>
