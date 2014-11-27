@@ -159,12 +159,8 @@
    -->
    <field name="title" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="subject" type="text_general" indexed="true" stored="true"/>
-<<<<<<< HEAD
-   <field name="description" type="text_general" indexed="true" stored="true"/>
-=======
    <field name="description" type="string" indexed="true" stored="true"/>
    <field name="description_term" type="text_general" indexed="true" stored="false" termVectors="true" termPositions="true" termOffsets="true" />
->>>>>>> 8b006496ca72e337b50e62bb8c067ed6af7544c8
    <field name="comments" type="text_general" indexed="true" stored="true"/>
    <field name="author" type="text_general" indexed="true" stored="true"/>
    <field name="keywords" type="text_general" indexed="true" stored="true"/>
