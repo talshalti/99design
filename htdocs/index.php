@@ -9,7 +9,41 @@ require_once("functions.php");
 
 
 
-function collectPages()
+
+function collectPagesElasticSearch()
+{
+    $database = Initialize_Database_Handler();
+
+    $query = "SELECT a.*, b.SponserName FROM cl_magazines_pages_list as a LEFT JOIN cl_magazines_list as b ON a.MagazineID=b.ID ORDER BY a.ID";
+
+    $file_contents = "";
+
+    $results = GetResults($query, $database);
+
+    foreach ($results as $row)
+    {
+        $meta = array("index" =>
+            array(
+                "_index" => "99design",
+                "_type" => "page",
+                "_id" => $row["ID"]
+            ));
+        $data = array(
+            "catalog_id" => $row["MagazineID"],
+            "page_number" =>  $row["PageNumber"],
+            "description" => $row["HtmlDescription"],
+            "img" => $row["Image"],
+            "keywords" => explode(",", $row["HtmlKeywords"]),
+            "owner" => strtolower($row["SponserName"])
+        );
+        $file_contents .= json_encode($meta)."\n".json_encode($data)."\n";
+    }
+
+    Save_File("pages.bin", $file_contents);
+}
+
+
+function collectPagesSolr()
 {
     $database = Initialize_Database_Handler();
 
@@ -29,7 +63,7 @@ function collectPages()
 	    XML_Add_Field("img", $row["Image"], $xml);
 	    XML_Add_Array("HTML_keywords", explode(",", $row["HtmlKeywords"]), $xml);
 	    XML_Add_Array("search_keywords", explode(",", $row["SearchKeywords"]), $xml);
-        XML_Add_Field("owner", strtolower(base64_encode($row["SponserName"])), $xml);
+        XML_Add_Field("owner", strtolower($row["SponserName"]), $xml);
 	}
 
 	Save_File("pages.xml", html_entity_decode(Format_XML($file)));
@@ -40,7 +74,7 @@ function Add_Catalog_To_Existing_Sponsor_XML($row, $sponsor_xml)
     XML_Add_Field("owned_catalogs", "cat".$row["ID"], $sponsor_xml);
 }
 
-function collectCatalogs()
+function collectCatalogsSolr()
 {
     $database = Initialize_Database_Handler();
 	$query = "SELECT * FROM cl_magazines_list ORDER BY 'ID'";
@@ -75,4 +109,4 @@ function collectCatalogs()
 
 	Save_File("catalogs2.xml", html_entity_decode(Format_XML($file)));
 }
-collectPages();
+collectPagesElasticSearch();

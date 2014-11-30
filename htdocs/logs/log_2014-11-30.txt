@@ -1,0 +1,13 @@
+[2014-11-30 20:21:38.828936] [CRITICAL] Test
+[2014-11-30 20:21:53.681225] [WARNING] Test
+[2014-11-30 20:22:46.041169] [WARNING] Array
+[2014-11-30 20:23:24.141057] [WARNING] Test Array : 
+    alrex: 'Hello'
+[2014-11-30 20:26:21.462018] [WARNING] Test Array : 
+    alrex: 'Hello'
+[2014-11-30 20:26:33.784318] [ERROR] Test Array : 
+    alrex: 'Hello'
+[2014-11-30 20:33:03.377845] [ERROR] Test Array : 
+    alrex: 'Hello'
+[2014-11-30 20:34:00.815783] [ERROR] Test Array : 
+    alrex: 'Hello'

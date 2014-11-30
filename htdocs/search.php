@@ -25,9 +25,25 @@ function solrGet($url)
     curl_close($ch);
     return $output;
 }
+
+function Query_Elastic_Search_Get($data)
+{
+    $ch = curl_init();
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_URL => $url,
+        CURLOPT_POST => 1,
+        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
+        CURLOPT_PORT => 9200
+    ));
+    $output=curl_exec($ch);
+    curl_close($ch);
+    return $output;
+}
+
 function Search($words, $must_have_first_word)
 {
-
     if(Invalid_Words($words))
     {
         Print_Error("ERROR OCCURED : Bad input");
@@ -63,6 +79,7 @@ function Search($words, $must_have_first_word)
         }
     }
 }
+
 /**
  * @param $results  mixed - resultset of the query
  * @return array - array of elements, so that each element contains info for the response
@@ -103,13 +120,15 @@ function Query_Database_For_Pages_Information($pages, $database)
     $database->execute();
     return $database->resultset();
 }
+
+
 /**
  * @param $words_list array
  * @return array
  */
 function Get_Relevant_Pages_ID_List_And_Num_Found($words_list, $must_have_first_word)
 {
-    $myArr = Create_Query_For_Solr($words_list, $must_have_first_word);
+    $myArr = Create_Query_For_ElasticSearch($words_list);
     $data = json_decode(solrGet("http://127.0.0.1/solr/collection1/query?" . http_build_query($myArr)));
     $pages = array();
     foreach ($data->{"response"}->{"docs"} as $doc) {
@@ -126,6 +145,45 @@ function Invalid_Words($words)
 {
     return strpos($words, "{") !== false or strpos($words, "[") !== false;
 }
+
+/**
+ * @param $words_list array - the words list
+ * @return array    the query arguments
+ */
+function Create_Query_For_ElasticSearch($words_list)
+{
+    $myArr = array();
+    $queryContainer = $myArr;
+    $phrase = implode(" ", $words_list);
+    $query = array(
+        "match_phrase" => array(
+            "_all" => array(
+                "query" => $phrase,
+                "analyzer" => "hebrew"
+            )
+        )
+    );
+
+    if (isset($_GET["st"])) {
+        $myArr["from"] = $_GET["st"];
+    }
+    if(isset($_GET["l"])) {
+        $myArr["size"] = $_GET["l"];
+    }
+    if(isset($_GET["o"]))
+    {
+        $queryContainer = array(
+            "filtered"=> array(
+                "term" => array(
+                    "owner" => $_GET["o"]
+                )
+            )
+        );
+    }
+    $queryContainer["query"] = $query;
+    return $myArr;
+}
+
 /**
  * @param $words_list array - the words list
  * @return array    the query arguments
@@ -163,6 +221,7 @@ function Create_Query_For_Solr($words_list, $must_have_first_word)
     }
     return $myArr;
 }
+
 function Print_Error($error_message)
 {
     echo json_encode(array(
