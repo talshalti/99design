@@ -5,87 +5,145 @@ if(!defined('DIRECT')){die('Direct access not permitted');}
  * Date: 7/24/13
  * Time: 4:39 PM
  */
-class Database{
-    private $host      = DB_HOST;
-    private $user      = DB_USER;
-    private $pass      = DB_PASSWORD;
-    private $dbname    = DB_NAME;
 
-    private $dbh;
-    private $error;
-    private $stmt;
+/**********************************************************
+    Class Definition
+***********************************************************/
+class Database{
+    // Database handler - PDO object
+    private $m_DatabaseHandler;
+
+    // Store the error
+    private $m_Error = "";
+
+    // Statement created
+    private $m_Statement;
 
     public function __construct(){
         // Set DSN
-        $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
         // Set options
         $options = array(
             PDO::ATTR_PERSISTENT    => true,
             PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION
         );
+
         // Create a new PDO instance
-        try{
-            $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
+        try
+        {
+            $this->m_DatabaseHandler = new PDO($dsn, DB_USER, DB_PASSWORD, $options);
         }
-            // Catch any errors
+        // Catch any errors
         catch(PDOException $e){
-            $this->error = $e->getMessage();
+            $this->m_Error = $e->getMessage();
         }
-    }
-    public function query($query){
-        $this->stmt = $this->dbh->prepare($query);
     }
 
-    public function bind($param, $value, $type = null){
-        if (is_null($type)) {
+    /* Generate a prepared statement
+     *
+     * @param $Query    String query to prepare
+     *
+    */
+    public function query($Query){
+        $this->m_Statement = $this->m_DatabaseHandler->prepare($Query);
+    }
+
+    /* Bind a value to a parameter in the prepared statement
+     *
+     * @param $Param    Parameter name
+     * @param $Value    Value to bind
+     * @pamar $Type     Parameter type (optional)
+     *
+    */
+    public function bind($Param, $Value, $Type = null){
+        if (is_null($Type)) {
             switch (true) {
-                case is_int($value):
-                    $type = PDO::PARAM_INT;
+                case is_int($Value):
+                    $Type = PDO::PARAM_INT;
                     break;
-                case is_bool($value):
-                    $type = PDO::PARAM_BOOL;
+                case is_bool($Value):
+                    $Type = PDO::PARAM_BOOL;
                     break;
-                case is_null($value):
-                    $type = PDO::PARAM_NULL;
+                case is_null($Value):
+                    $Type = PDO::PARAM_NULL;
                     break;
                 default:
-                    $type = PDO::PARAM_STR;
+                    $Type = PDO::PARAM_STR;
             }
         }
-        $this->stmt->bindValue($param, $value, $type);
+        $this->m_Statement->bindValue($Param, $Value, $Type);
     }
 
-    public function execute(){
-        return $this->stmt->execute();
+    /*
+     * Execute the statement and return the result
+    */
+    public function Execute(){
+        return $this->m_Statement->execute();
     }
 
-    public function resultset(){
+    /*
+     * Return the error message
+     *
+     * @return Error string
+    */
+    public function getError(){
+        return $this->m_Error;
+    }
+
+    /*
+     * Return the array of data after the execution
+    */
+    public function GetResultset(){
         $this->execute();
-        return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->m_Statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function single(){
+    /*
+     * Return a single object of data after the execution
+    */
+    public function GetSingle(){
         $this->execute();
-        return $this->stmt->fetch(PDO::FETCH_ASSOC);
+        return $this->m_Statement->fetch(PDO::FETCH_ASSOC);
     }
 
-	public function beginTransaction(){
-        $this->dbh->beginTransaction();
+    /*
+     * Begin the transaction. Start collecting the executions, don't send yet.
+    */
+	public function BeginTransaction(){
+        $this->m_DatabaseHandler->beginTransaction();
     }
 
-	public function comit(){
-        $this->dbh->commit();
+    /*
+     * Send all collected executions.
+    */
+	public function Commit(){
+        $this->m_DatabaseHandler->commit();
     }
 
-    public function rowCount(){
-        return $this->stmt->rowCount();
-    }
-    
-    public function lastInsertId(){
-        return $this->dbh->lastInsertId();
+    /*
+     * Return the row count of the last execution
+     *
+     * @return Number of rows
+    */
+    public function GetRowCount(){
+        return $this->m_Statement->rowCount();
     }
 
-    public function debugDumpParams(){
-        return $this->stmt->debugDumpParams();
+    /*
+     * Return the last inserted ID
+     *
+     * @return ID
+    */
+    public function GetLastInsertId(){
+        return $this->m_DatabaseHandler->lastInsertId();
+    }
+
+    /*
+     * Returns valuable debug parameters
+     *
+     * @return debug data
+    */
+    public function GetDebugDumpParams(){
+        return $this->m_Statement->debugDumpParams();
     }
 }
