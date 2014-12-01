@@ -44,3 +44,5 @@ define('LOG_EMAIL_SUBJECT', "Error Occurred on 99Design.co.il");
 ***********************************************************/
 // Root URL of the Elastic Search
 define('ELASTIC_URL', "http://localhost:9200/");
+
+define('ELASTIC_INDEX', "http://localhost:9200/99design/");

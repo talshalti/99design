@@ -780,6 +780,16 @@
       </analyzer>
     </fieldType>
 
+
+      <!-- hebrew -->
+    <fieldType name="text_he" class="solr.TextField" positionIncrementGap="100">
+      <analyzer> 
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="org.apache.lucene.analysis.hebrew.NiqqudFilter"/>
+      </analyzer>
+    </fieldType>
+
     <!-- Bulgarian -->
     <fieldType name="text_bg" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 

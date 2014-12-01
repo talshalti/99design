@@ -6,7 +6,6 @@
  * Time: 23:00
  */
 ini_set('error_reporting', E_ALL);
-define('DIRECT', false);
 require_once("config.php");
 require_once("database.php");
 require_once("functions.php");
@@ -26,13 +25,13 @@ function solrGet($url)
     return $output;
 }
 
-function Query_Elastic_Search_Get($data)
+function Query_Elastic_Search($data)
 {
     $ch = curl_init();
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => 1,
-        CURLOPT_URL => $url,
-        CURLOPT_POST => 1,
+        CURLOPT_URL => ELASTIC_INDEX."_search",
+        CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POSTFIELDS => json_encode($data),
         CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
         CURLOPT_PORT => 9200
@@ -42,7 +41,7 @@ function Query_Elastic_Search_Get($data)
     return $output;
 }
 
-function Search($words, $must_have_first_word)
+function Search($words)
 {
     if(Invalid_Words($words))
     {
@@ -50,7 +49,7 @@ function Search($words, $must_have_first_word)
         return;
     }
     $words_list = explode(" ",$words);
-    list($pages, $numFound) = Get_Relevant_Pages_ID_List_And_Num_Found($words_list, $must_have_first_word);
+    list($pages, $numFound) = Get_Relevant_Pages_ID_List_And_Num_Found($words_list);
 
     if(count($pages) != 0)
     {
@@ -65,18 +64,12 @@ function Search($words, $must_have_first_word)
     }
     else
     {
-        if($must_have_first_word && $numFound == 0)
-        {
-            Search($words, false);
-        }
-        else
-        {
-            echo json_encode(
-                array(
-                    "results"=>[],
-                    "numFound"=>$numFound
-                ));
-        }
+        echo json_encode(
+            array(
+                "results"=>[],
+                "numFound"=>$numFound
+            ));
+
     }
 }
 
@@ -126,16 +119,16 @@ function Query_Database_For_Pages_Information($pages, $database)
  * @param $words_list array
  * @return array
  */
-function Get_Relevant_Pages_ID_List_And_Num_Found($words_list, $must_have_first_word)
+function Get_Relevant_Pages_ID_List_And_Num_Found($words_list)
 {
     $myArr = Create_Query_For_ElasticSearch($words_list);
-    $data = json_decode(solrGet("http://127.0.0.1/solr/collection1/query?" . http_build_query($myArr)));
+    $data = json_decode(Query_Elastic_Search($myArr));
     $pages = array();
-    foreach ($data->{"response"}->{"docs"} as $doc) {
-        $pages[] = substr($doc->{"id"}, 3);
+    foreach ($data->{"hits"}->{"hits"} as $doc) {
+        $pages[] = $doc->{"_id"};
     }
 
-    return array($pages, $data->{"response"}->{"numFound"});
+    return array($pages, $data->{"hits"}->{"total"});
 }
 /**
  * @param $words array  - the words list
@@ -153,7 +146,6 @@ function Invalid_Words($words)
 function Create_Query_For_ElasticSearch($words_list)
 {
     $myArr = array();
-    $queryContainer = $myArr;
     $phrase = implode(" ", $words_list);
     $query = array(
         "match_phrase" => array(
@@ -172,15 +164,21 @@ function Create_Query_For_ElasticSearch($words_list)
     }
     if(isset($_GET["o"]))
     {
-        $queryContainer = array(
+        $myArr["query"] = array(
             "filtered"=> array(
-                "term" => array(
-                    "owner" => $_GET["o"]
-                )
+                "filter" => array(
+                    "term" => array(
+                        "owner" => $_GET["o"]
+                    )
+                ),
+                "query" => $query
             )
         );
     }
-    $queryContainer["query"] = $query;
+    else
+    {
+        $myArr["query"] = $query;
+    }
     return $myArr;
 }
 
