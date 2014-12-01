@@ -64,6 +64,19 @@ class HTTPInterface {
         return $this->Submit($Url, "GET");
     }
 
+    /* Submit a PUT request to URL
+     *
+     * @param $Url      The path to submit to
+     * @param $Array    Data to submit
+     *
+     * @return          CURL Response
+     *
+    */
+    public function Put($Url, $Array)
+    {
+        return $this->Submit($Url, "PUT", $Array);
+    }
+
     /* Submit a DELETE request to URL
      *
      * @param $Url      The path to submit to
@@ -99,13 +112,11 @@ class HTTPInterface {
             {
                 if (empty($object))
                 {
-                    $this->m_Logger->warning("Empty Object Provided in Elastic Interface Bulk Generate");
+                    $this->m_Logger->info("Empty Object Provided in Elastic Interface Bulk Generate");
                 }
-                else
-                {
-                    $payload .= json_encode($object);
-                    $payload .= '\n'; // Add separator for elastic search.
-                }
+
+                $payload .= json_encode($object);
+                $payload .= "\n"; // Add separator for elastic search.
             }
         }
 

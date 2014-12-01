@@ -10,7 +10,7 @@
     Default Values
 ***********************************************************/
 define('DIRECT', false);
-define('ROOT_DIR', realpath(dirname(__FILE__)));
+define('ROOT_DIR', realpath(dirname(__FILE__)) . '\\');
 
 /**********************************************************
     Database Settings
@@ -45,4 +45,8 @@ define('LOG_EMAIL_SUBJECT', "Error Occurred on 99Design.co.il");
 // Root URL of the Elastic Search
 define('ELASTIC_URL', "http://localhost:9200/");
 
-define('ELASTIC_INDEX', "http://localhost:9200/99design/");
+// Default max search results
+define('ELASTIC_SEARCH_RESULTS_DEFAULT', 20);
+
+// Max search results
+define('ELASTIC_SEARCH_RESULTS_MAX', 100);

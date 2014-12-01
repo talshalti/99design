@@ -37,6 +37,8 @@ class Database{
         catch(PDOException $e){
             $this->m_Error = $e->getMessage();
         }
+
+        $this->m_DatabaseHandler->Query("SET CHARACTER SET utf8");
     }
 
     /* Generate a prepared statement
@@ -44,7 +46,7 @@ class Database{
      * @param $Query    String query to prepare
      *
     */
-    public function query($Query){
+    public function Query($Query){
         $this->m_Statement = $this->m_DatabaseHandler->prepare($Query);
     }
 
@@ -55,7 +57,7 @@ class Database{
      * @pamar $Type     Parameter type (optional)
      *
     */
-    public function bind($Param, $Value, $Type = null){
+    public function Bind($Param, $Value, $Type = null){
         if (is_null($Type)) {
             switch (true) {
                 case is_int($Value):
@@ -86,7 +88,7 @@ class Database{
      *
      * @return Error string
     */
-    public function getError(){
+    public function GetError(){
         return $this->m_Error;
     }
 
